@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-master
+  labels:
+    app: cicd-master
+    environment: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cicd-master
+      environment: production
+  template:
+    metadata:
+      name: jenkins
+      labels:
+        app: cicd-master
+        environment: production
+    spec:
+      containers:
+        - name: jenkins-master
+          image: jenkins/jenkins:lts
+          ports:
+            - name: cicd-master
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          volumeMounts:
+            - name: jenkins-nfs-data
+              mountPath: /var/jenkins_home
+      volumes:
+        - name: jenkins-data
+          nfs:
+            server: nfs-server.example.com
+            path: /exported/path/to/jenkins
+            
+
